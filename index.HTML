@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bagagem Inteligente · Organize sua viagem</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f0f4fe;
+      color: #0b1a33;
+      line-height: 1.5;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* FUNDO ANIMADO — partículas flutuantes */
+    #animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 30%, #ffffff 0%, #e9efff 100%);
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(49, 93, 204, 0.08);
+      border-radius: 50%;
+      animation: floatParticle 18s infinite ease-in-out;
+      filter: blur(1px);
+      box-shadow: 0 0 20px rgba(49, 93, 204, 0.1);
+    }
+
+    @keyframes floatParticle {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translate(40px, -60px) scale(1.2);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+      }
+    }
+
+    /* container principal sobre o fundo */
+    .page-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+
+    header {
+      background: linear-gradient(145deg, #0b1f3b 0%, #1e3c72 100%);
+      color: white;
+      padding: 40px 20px 35px;
+      text-align: center;
+      border-bottom-left-radius: 40px;
+      border-bottom-right-radius: 40px;
+      box-shadow: 0 20px 30px -10px rgba(0, 20, 60, 0.4);
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 140%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+      animation: shimmer 8s infinite linear;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-20%) rotate(0deg); }
+      100% { transform: translateX(20%) rotate(5deg); }
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header h1 span {
+      font-size: 2.8rem;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      font-weight: 400;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 32px;
+      padding: 28px 28px 30px;
+      margin-bottom: 28px;
+      box-shadow: 0 20px 40px -15px rgba(0, 20, 60, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 25px 50px -12px rgba(0, 20, 60, 0.25);
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #0b1f3b;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e3c72;
+      margin: 24px 0 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #2a4b7a;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea, button {
+      font-family: inherit;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1.5px solid #d9e2f0;
+      background: rgba(255, 255, 255, 0.8);
+      font-size: 1rem;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      outline: none;
+      color: #0b1a33;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #315dcc;
+      box-shadow: 0 0 0 4px rgba(49, 93, 204, 0.1);
+      background: #ffffff;
+    }
+
+    button {
+      background: #1e3c72;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 10px 20px -8px rgba(30, 60, 114, 0.4);
+      padding: 16px 20px;
+      border-radius: 40px;
+    }
+
+    button:hover {
+      background: #0f2b4f;
+      box-shadow: 0 14px 24px -8px rgba(30, 60, 114, 0.6);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.9);
+      color: #1e3c72;
+      border: 1.5px solid #cfdcf0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    }
+
+    .secondary:hover {
+      background: #ffffff;
+      border-color: #315dcc;
+      box-shadow: 0 8px 18px -6px rgba(49, 93, 204, 0.2);
+    }
+
+    .results {
+      display: none;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 16px;
+      margin: 20px 0 10px;
+    }
+
+    .stat {
+      background: linear-gradient(145deg, #ffffff, #f3f8ff);
+      padding: 22px 12px;
+      border-radius: 24px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #1e3c72;
+      line-height: 1.2;
+    }
+
+    .stat span {
+      font-size: 0.9rem;
+      color: #4a6388;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-weight: 500;
+    }
+
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      border: 1px solid #e2eaf7;
+      transition: background 0.15s, opacity 0.15s;
+      backdrop-filter: blur(4px);
+    }
+
+    .item input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: #1e3c72;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .item.done {
+      opacity: 0.55;
+      text-decoration: line-through;
+      background: #f0f6ff;
+    }
+
+    .progress {
+      height: 14px;
+      background: rgba(30, 60, 114, 0.08);
+      border-radius: 30px;
+      overflow: hidden;
+      margin: 10px 0 8px;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1e3c72, #3b6ad0);
+      border-radius: 30px;
+      transition: width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+      box-shadow: 0 0 12px rgba(49, 93, 204, 0.5);
+    }
+
+    #progressoTexto {
+      font-weight: 500;
+      color: #1e3c72;
+      margin-bottom: 6px;
+    }
+
+    .document {
+      border: 1px solid #d9e6ff;
+      border-radius: 22px;
+      padding: 18px 20px;
+      margin-top: 14px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.05);
+    }
+
+    .document strong {
+      font-size: 1.1rem;
+      color: #0b1f3b;
+    }
+
+    .document small {
+      color: #5b7297;
+      display: block;
+      margin: 4px 0 12px;
+    }
+
+    .document button {
+      padding: 10px 18px;
+      width: auto;
+      font-size: 0.9rem;
+      margin-right: 8px;
+      margin-top: 4px;
+      border-radius: 30px;
+    }
+
+    .warning {
+      background: #fff8e5;
+      padding: 16px 20px;
+      border-radius: 20px;
+      color: #7a5d00;
+      margin-top: 18px;
+      font-size: 0.95rem;
+      border-left: 6px solid #f5b800;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    .success {
+      background: #e3f7eb;
+      color: #0d6630;
+      padding: 16px 20px;
+      border-radius: 20px;
+      margin-top: 18px;
+      font-weight: 500;
+      border-left: 6px solid #2e9e5b;
+      display: inline-block;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px 30px;
+      color: #5b7297;
+      font-size: 1rem;
+      font-weight: 400;
+      position: relative;
+      z-index: 2;
+      letter-spacing: 0.2px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* ajustes responsivos */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+        flex-wrap: wrap;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .card {
+        padding: 22px 18px;
+      }
+      .stat strong {
+        font-size: 1.8rem;
+      }
+      .document button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FUNDO ANIMADO -->
+  <div id="animated-bg"></div>
+
+  <div class="page-wrapper">
+
+    <header>
+      <h1><span>🧳</span> Bagagem Inteligente</h1>
+      <p>Seu organizador de viagens em um só lugar</p>
+    </header>
+
+    <div class="container">
+
+      <!-- PLANEJAMENTO -->
+      <div class="card">
+        <h2>✈️ Planejar viagem</h2>
+
+        <div class="grid">
+          <div>
+            <label>Destino</label>
+            <input id="destino" placeholder="Ex: Rio de Janeiro">
+          </div>
+          <div>
+            <label>Quantidade de dias</label>
+            <input id="dias" type="number" min="1" value="5">
+          </div>
+          <div>
+            <label>Clima previsto</label>
+            <select id="clima">
+              <option value="quente">☀️ Quente</option>
+              <option value="frio">❄️ Frio</option>
+              <option value="chuvoso">🌧️ Chuvoso</option>
+              <option value="variado">🌤️ Variado</option>
+            </select>
+          </div>
+          <div>
+            <label>Tipo de viagem</label>
+            <select id="tipo">
+              <option value="normal">Normal</option>
+              <option value="praia">Praia</option>
+              <option value="negocios">Negócios</option>
+              <option value="aventura">Aventura</option>
+            </select>
+          </div>
+        </div>
+
+        <br>
+        <button onclick="calcularBagagem()">
+          ✨ Montar minha bagagem
+        </button>
+      </div>
+
+      <!-- RESULTADO -->
+      <div class="card results" id="resultado">
+        <h2>📋 Sua bagagem</h2>
+        <p id="resumo"></p>
+
+        <div class="stats">
+          <div class="stat"><strong id="roupasQtd">0</strong><span>roupas</span></div>
+          <div class="stat"><strong id="calcadosQtd">0</strong><span>calçados</span></div>
+          <div class="stat"><strong id="higieneQtd">0</strong><span>higiene</span></div>
+          <div class="stat"><strong id="extrasQtd">0</strong><span>extras</span></div>
+        </div>
+
+        <h3>📝 Checklist</h3>
+        <div class="progress">
+          <div class="progress-bar" id="progress"></div>
+        </div>
+        <p id="progressoTexto">0% concluído</p>
+
+        <div id="checklist" class="checklist"></div>
+      </div>
+
+      <!-- DOCUMENTOS -->
+      <div class="card">
+        <h2>🔐 Cofre de documentos</h2>
+        <p style="margin-bottom: 16px; color: #2a4b7a;">
+          Guarde informações importantes da viagem de forma protegida no dispositivo.
+        </p>
+
+        <div class="grid">
+          <div>
+            <label>Senha do cofre</label>
+            <input id="senha" type="password" placeholder="Crie uma senha">
+          </div>
+          <div>
+            <label>Tipo de documento</label>
+            <select id="docTipo">
+              <option>Passaporte</option>
+              <option>Voucher</option>
+              <option>Ingresso</option>
+              <option>Reserva de hotel</option>
+              <option>Seguro viagem</option>
+              <option>Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <br>
+        <label>Nome do documento</label>
+        <input id="docNome" placeholder="Ex: Passaporte">
+
+        <br><br>
+        <label>Informações</label>
+        <textarea id="docConteudo" placeholder="Número, código, observações..." style="width:100%;height:100px;padding:14px;border-radius:18px;border:1.5px solid #d9e2f0;font-family:inherit;background:rgba(255,255,255,0.8);"></textarea>
+
+        <br><br>
+        <button onclick="salvarDocumento()">
+          🔒 Criptografar e salvar
+        </button>
+
+        <div id="documentos"></div>
+
+        <div class="warning">
+          ⚠️ Os documentos ficam armazenados localmente neste navegador. Não envie sua senha para ninguém.
+        </div>
+      </div>
+
+      <!-- MODO OFFLINE -->
+      <div class="card">
+        <h2>📴 Modo offline</h2>
+        <p style="color: #2a4b7a;">Este aplicativo foi criado para funcionar sem depender de internet depois de carregado.</p>
+        <br>
+        <button class="secondary" onclick="testarOffline()">
+          Verificar armazenamento local
+        </button>
+        <p id="offlineStatus"></p>
+      </div>
+
+    </div>
+
+    <footer>
+      🧳 Bagagem Inteligente — Organize. Viaje. Aproveite.
+    </footer>
+
+  </div>
+
+  <script>
+    (function() {
+      // =========================
+      // FUNDO ANIMADO (partículas)
+      // =========================
+      function createParticles() {
+        const bg = document.getElementById('animated-bg');
+        const count = 18;
+
+        for (let i = 0; i < count; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+
+          const size = Math.random() * 140 + 40; // 40px a 180px
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.top = Math.random() * 100 + '%';
+
+          const delay = Math.random() * 12;
+          particle.style.animationDelay = delay + 's';
+          particle.style.animationDuration = (14 + Math.random() * 12) + 's';
+
+          // Variação de cor sutil
+          const hue = 210 + Math.random() * 40; // azul a lilás
+          const opacity = 0.04 + Math.random() * 0.08;
+          particle.style.background = `hsla(${hue}, 70%, 60%, ${opacity})`;
+
+          bg.appendChild(particle);
+        }
+      }
+
+      createParticles();
+
+      // =========================
+      // BAGAGEM
+      // =========================
+      let itens = [];
+
+      window.calcularBagagem = function() {
+        const destino = document.getElementById("destino").value || "seu destino";
+        const dias = Math.max(1, Number(document.getElementById("dias").value));
+        const clima = document.getElementById("clima").value;
+        const tipo = document.getElementById("tipo").value;
+
+        let roupas = dias + 1;
+        if (dias >= 7) roupas = Math.ceil(dias * 0.8);
+
+        let calcados = 2;
+        let higiene = 6;
+        let extras = 3;
+
+        itens = [];
+
+        /* ROUPAS */
+        for (let i = 1; i <= roupas; i++) {
+          let roupa = "Camiseta / blusa";
+          if (clima === "frio") roupa = "Blusa ou peça quente";
+          itens.push(roupa + " " + i);
+        }
+
+        itens.push("Calça / bermuda");
+
+        if (clima === "frio") {
+          itens.push("Casaco");
+          itens.push("Meias quentes");
+        }
+        if (clima === "chuvoso") itens.push("Capa de chuva");
+        if (clima === "variado") itens.push("Casaco leve");
+
+        /* CALÇADOS */
+        itens.push("Tênis confortável");
+        itens.push("Calçado reserva");
+        if (tipo === "praia") itens.push("Chinelo");
+        if (tipo === "aventura") itens.push("Calçado para caminhada");
+
+        /* HIGIENE */
+        itens.push("Escova de dentes");
+        itens.push("Pasta de dentes");
+        itens.push("Sabonete");
+        itens.push("Shampoo");
+        itens.push("Desodorante");
+        itens.push("Toalha");
+
+        /* ELETRÔNICOS */
+        itens.push("Carregador do celular");
+        itens.push("Power bank");
+
+        /* DOCUMENTOS */
+        itens.push("Documento de identificação");
+        itens.push("Comprovantes da viagem");
+
+        if (tipo === "praia") {
+          itens.push("Protetor solar");
+          itens.push("Óculos de sol");
+        }
+        if (tipo === "negocios") {
+          itens.push("Roupa adequada para compromissos");
+          itens.push("Material de trabalho");
+        }
+        if (tipo === "aventura") {
+          itens.push("Garrafa de água");
+          itens.push("Lanterna");
+        }
+
+        document.getElementById("resultado").style.display = "block";
+
+        document.getElementById("resumo").innerHTML =
+          `Viagem para <strong>${destino}</strong> durante <strong>${dias} dia(s)</strong>. Clima: <strong>${clima}</strong>.`;
+
+        document.getElementById("roupasQtd").textContent = roupas;
+        document.getElementById("calcadosQtd").textContent = calcados;
+        document.getElementById("higieneQtd").textContent = higiene;
+        document.getElementById("extrasQtd").textContent = extras;
+
+        gerarChecklist();
+
+        window.scrollTo({
+          top: document.getElementById("resultado").offsetTop - 20,
+          behavior: "smooth"
+        });
+      };
+
+      // =========================
+      // CHECKLIST
+      // =========================
+      function gerarChecklist() {
+        const lista = document.getElementById("checklist");
+        lista.innerHTML = "";
+
+        itens.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <input type="checkbox" onchange="atualizarProgresso()" id="item${index}">
+            <label for="item${index}" style="margin:0;font-weight:normal;text-transform:none;letter-spacing:normal;color:#0b1a33;font-size:1rem;">
+              ${item}
+            </label>
+          `;
+          lista.appendChild(div);
+        });
+
+        atualizarProgresso();
+      }
+
+      window.atualizarProgresso = function() {
+        const checks = document.querySelectorAll("#checklist input[type='checkbox']");
+        if (!checks.length) return;
+
+        const marcados = [...checks].filter(c => c.checked).length;
+        const porcentagem = Math.round((marcados / checks.length) * 100);
+
+        document.getElementById("progress").style.width = porcentagem + "%";
+        document.getElementById("progressoTexto").textContent = porcentagem + "% concluído";
+
+        checks.forEach(check => {
+          const item = check.closest(".item");
+          if (check.checked) item.classList.add("done");
+          else item.classList.remove("done");
+        });
+      };
+
+      // =========================
+      // CRIPTOGRAFIA
+      // =========================
+      const STORAGE_KEY = "bagagem_inteligente_documentos";
+
+      async function derivarChave(senha, salt) {
+        const encoder = new TextEncoder();
+        const material = await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(senha),
+          "PBKDF2",
+          false,
+          ["deriveKey"]
+        );
+
+        return crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 100000,
+            hash: "SHA-256"
+          },
+          material,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["encrypt", "decrypt"]
+        );
+      }
+
+      function arrayBufferToBase64(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = "";
+        bytes.forEach(byte => { binary += String.fromCharCode(byte); });
+        return btoa(binary);
+      }
+
+      function base64ToArrayBuffer(base64) {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes.buffer;
+      }
+
+      window.salvarDocumento = async function() {
+        const senha = document.getElementById("senha").value;
+        const nome = document.getElementById("docNome").value;
+        const tipo = document.getElementById("docTipo").value;
+        const conteudo = document.getElementById("docConteudo").value;
+
+        if (!senha || !nome || !conteudo) {
+          alert("Preencha a senha, o nome e as informações.");
+          return;
+        }
+
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const chave = await derivarChave(senha, salt);
+
+        const dados = JSON.stringify({ nome, tipo, conteudo });
+
+        const criptografado = await crypto.subtle.encrypt(
+          { name: "AES-GCM", iv: iv },
+          chave,
+          new TextEncoder().encode(dados)
+        );
+
+        const documentos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+        documentos.push({
+          nome,
+          tipo,
+          data: new Date().toLocaleDateString("pt-BR"),
+          salt: arrayBufferToBase64(salt),
+          iv: arrayBufferToBase64(iv),
+          dados: arrayBufferToBase64(criptografado)
+        });
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(documentos));
+
+        document.getElementById("docNome").value = "";
+        document.getElementById("docConteudo").value = "";
+
+        carregarDocumentos();
+        alert("Documento criptografado e salvo!");
+      };
+
+      window.abrirDocumento = async function(index) {
+        const senha = document.getElementById("senha").value;
+        if (!senha) {
+          alert("Digite a senha do cofre.");
+          return;
+        }
+
+        const documentos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        const doc = documentos[index];
+
+        try {
+          const salt = base64ToArrayBuffer(doc.salt);
+          const iv = base64ToArrayBuffer(doc.iv);
+          const dados = base64ToArrayBuffer(doc.dados);
+          const chave = await derivarChave(senha, salt);
+
+          const resultado = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: new Uint8Array(iv) },
+            chave,
+            dados
+          );
+
+          const texto = new TextDecoder().decode(resultado);
+          const documento = JSON.parse(texto);
+
+          alert("📄 " + documento.nome + "\n\nTipo: " + documento.tipo + "\n\nInformações:\n" + documento.conteudo);
+        } catch {
+          alert("❌ Não foi possível abrir o documento.\nVerifique se a senha está correta.");
+        }
+      };
+
+      window.excluirDocumento = function(index) {
+        if (!confirm("Excluir este documento?")) return;
+
+        const documentos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        documentos.splice(index, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(documentos));
+        carregarDocumentos();
+      };
+
+      // =========================
+      // LISTAR DOCUMENTOS
+      // =========================
+      function carregarDocumentos() {
+        const container = document.getElementById("documentos");
+        const documentos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+        container.innerHTML = "<h3>📁 Documentos salvos</h3>";
+
+        if (!documentos.length) {
+          container.innerHTML += "<p style='color:#5b7297;'>Nenhum documento salvo.</p>";
+          return;
+        }
+
+        documentos.forEach((doc, index) => {
+          const div = document.createElement("div");
+          div.className = "document";
+          div.innerHTML = `
+            <strong>🔐 ${doc.nome}</strong>
+            <small>${doc.tipo} • ${doc.data}</small>
+            <button onclick="abrirDocumento(${index})">🔓 Abrir</button>
+            <button class="secondary" onclick="excluirDocumento(${index})">🗑️ Excluir</button>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      // =========================
+      // OFFLINE
+      // =========================
+      window.testarOffline = function() {
+        try {
+          localStorage.setItem("teste_offline", "ok");
+          localStorage.removeItem("teste_offline");
+          document.getElementById("offlineStatus").innerHTML =
+            `<span class="success">✅ Armazenamento local funcionando. Seus dados podem ser acessados sem internet.</span>`;
+        } catch {
+          document.getElementById("offlineStatus").innerHTML =
+            `<span class="warning">⚠️ O armazenamento local não está disponível.</span>`;
+        }
+      };
+
+      // =========================
+      // INICIALIZAÇÃO
+      // =========================
+      carregarDocumentos();
+    })();
+  </script>
+
+</body>
+</html>
